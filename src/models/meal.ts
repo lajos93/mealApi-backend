@@ -1,12 +1,12 @@
 import { model, Schema, Model, Document } from 'mongoose';
 
 export interface IMeal extends Document {
-    searchWord: string;
+    searchWord: [string];
     result: [];
 }
 
 const MealSchema: Schema = new Schema({
-    searchWord: { type: String, required: true },
+    searchWord: { type: [] },
     result: { type: [], required: true },
 });
 
