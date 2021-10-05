@@ -16,6 +16,6 @@ mongoose
         console.table([{ server: 'running', status: 'ok' }]);
         app.listen(3001);
     })
-    .catch((error: any) => {
+    .catch((error: string) => {
         console.log(error);
     });

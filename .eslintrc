@@ -1,0 +1,25 @@
+{
+    "extends": [
+        "eslint:recommended",
+        "eslint-config-prettier",
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended"
+    ],
+
+    "plugins": ["import"],
+    "rules": {
+        "trailing-comma": 0,
+        "no-console": 0,
+        "import/no-unresolved": "error"
+    },
+    "settings": {
+        "import/parsers": {
+            "@typescript-eslint/parser": [".ts", ".tsx"]
+        },
+        "import/resolver": {
+            "typescript": {
+                "alwaysTryTypes": true
+            }
+        }
+    }
+}

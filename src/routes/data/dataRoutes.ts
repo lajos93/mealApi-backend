@@ -3,9 +3,9 @@ import express from 'express';
 const router = express.Router();
 
 import axios from 'axios';
-import { IMeal, Meal } from '../../models/meal';
+import { IMeal, IMealResult, Meal } from '../../models/meal';
 
-router.get('/:item', (req, res, next) => {
+router.get('/:item', (req, res) => {
     Meal.findOne(
         { searchWord: req.params.item },
         (err: string, foundMeal: IMeal) => {
@@ -83,6 +83,34 @@ router.get('/:item', (req, res, next) => {
                         console.log(error);
                     });
             }
+        }
+    );
+});
+
+router.post('/', (req, res) => {
+    const mealData: IMealResult = req.body.mealData;
+    mealData.idMeal = Math.floor(
+        Math.random() * (1000000 - 100000 + 1) + 100000
+    ).toString();
+
+    Meal.findOneAndUpdate(
+        {
+            searchWord: req.body.searchWord,
+            'result.strMeal': {
+                $ne: req.body.mealData.strMeal,
+            },
+        },
+
+        { $push: { result: mealData } },
+        (err: string, foundMeal: IMeal) => {
+            if (err) console.log({ error: err });
+            if (foundMeal === null) {
+                res.status(403).json({
+                    errorCode: 403,
+                    message: 'Name already exists',
+                });
+            }
+            if (!err && foundMeal !== null) res.json(foundMeal);
         }
     );
 });
