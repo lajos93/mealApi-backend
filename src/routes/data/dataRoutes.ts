@@ -168,4 +168,40 @@ router.put('/', (req, res) => {
     );
 });
 
+router.delete('/', (req, res) => {
+    const filter = {
+        searchWord: req.body.searchWord,
+    };
+
+    const update = {
+        $pull: {
+            result: { idMeal: req.body.mealData.idMeal },
+        },
+    };
+
+    const options = {
+        returnOriginal: false,
+    };
+
+    //Favorite.updateOne( {cn: req.params.name}, { $pullAll: {uid: [req.params.deleteUid] } } )
+
+    Meal.findOneAndUpdate(
+        filter,
+        update,
+        options,
+        function (err: never, foundMeal: IMeal) {
+            if (err) console.log({ error: err });
+            if (foundMeal === null) {
+                res.status(404).json({
+                    errorCode: 404,
+                    message: 'Meal not found',
+                });
+            }
+            if (!err && foundMeal !== null) {
+                res.json(foundMeal.result);
+            }
+        }
+    );
+});
+
 export { router as dataRoutes };
