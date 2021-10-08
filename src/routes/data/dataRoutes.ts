@@ -93,16 +93,21 @@ router.post('/', (req, res) => {
         Math.random() * (1000000 - 100000 + 1) + 100000
     ).toString();
 
-    Meal.findOneAndUpdate(
-        {
-            searchWord: req.body.searchWord,
-            'result.strMeal': {
-                $ne: req.body.mealData.strMeal,
-            },
+    const filter = {
+        searchWord: req.body.searchWord,
+        'result.strMeal': {
+            $ne: req.body.mealData.strMeal,
         },
+    };
+    const update = { $push: { result: mealData } };
 
-        { $push: { result: mealData } },
-        (err: string, foundMeal: IMeal) => {
+    Meal.findOneAndUpdate(
+        filter,
+        update,
+        {
+            returnOriginal: false,
+        },
+        function (err, foundMeal) {
             if (err) console.log({ error: err });
             if (foundMeal === null) {
                 res.status(403).json({
@@ -110,7 +115,55 @@ router.post('/', (req, res) => {
                     message: 'Name already exists',
                 });
             }
-            if (!err && foundMeal !== null) res.json(foundMeal);
+            if (!err && foundMeal !== null) {
+                console.log(foundMeal.result.length);
+                res.json(foundMeal.result[foundMeal.result.length - 1]);
+            }
+        }
+    );
+});
+
+router.put('/', (req, res) => {
+    const filter = {
+        searchWord: req.body.searchWord,
+        'result.idMeal': req.body.mealData.idMeal,
+    };
+
+    const update = {
+        $set: {
+            'result.$[element].strMeal': req.body.mealData.strMeal,
+        },
+    };
+
+    const options = {
+        returnDocument: 'after',
+        arrayFilters: [
+            {
+                'element.idMeal': req.body.mealData.idMeal,
+            },
+        ],
+        projection: {
+            result: {
+                $elemMatch: { strMeal: req.body.mealData.strMeal },
+            },
+        },
+    };
+
+    Meal.findOneAndUpdate(
+        filter,
+        update,
+        options,
+        function (err: never, foundMeal: IMeal) {
+            if (err) console.log({ error: err });
+            if (foundMeal === null) {
+                res.status(404).json({
+                    errorCode: 404,
+                    message: 'Meal not found',
+                });
+            }
+            if (!err && foundMeal !== null) {
+                res.json(foundMeal.result[0]);
+            }
         }
     );
 });
