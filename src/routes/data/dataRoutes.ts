@@ -183,8 +183,6 @@ router.delete('/', (req, res) => {
         returnOriginal: false,
     };
 
-    //Favorite.updateOne( {cn: req.params.name}, { $pullAll: {uid: [req.params.deleteUid] } } )
-
     Meal.findOneAndUpdate(
         filter,
         update,
