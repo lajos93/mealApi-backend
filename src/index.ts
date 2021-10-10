@@ -2,13 +2,17 @@ import express from 'express';
 import mongoose from 'mongoose';
 import { json } from 'body-parser';
 
-import { dataRoutes } from './routes/data/dataRoutes';
+import { name } from './routes/data/name';
+import { category } from './routes/data/category';
+import { ingredient } from './routes/data/ingredient';
 
 import { database } from './db/db';
 
 const app = express();
 app.use(json());
-app.use('/api/meals', dataRoutes);
+app.use('/api/meals/name', name);
+app.use('/api/meals/category', category);
+app.use('/api/meals/ingredient', ingredient);
 
 mongoose
     .connect(database)

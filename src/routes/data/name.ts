@@ -19,7 +19,6 @@ router.get('/:item', (req, res) => {
                     .then((response) => {
                         let meal;
                         if (response.data.meals) {
-                            console.log(1);
                             meal = new Meal({
                                 searchWord: req.params.item,
                                 result: response.data.meals,
@@ -48,7 +47,6 @@ router.get('/:item', (req, res) => {
                                         updateError: string,
                                         updatedMeal: IMeal
                                     ) => {
-                                        // const searchWords = foundMeal.map((a) => a.searchWord).toString();
                                         if (updatedMeal) {
                                             Meal.findOneAndDelete(
                                                 {
@@ -202,4 +200,4 @@ router.delete('/', (req, res) => {
     );
 });
 
-export { router as dataRoutes };
+export { router as name };
