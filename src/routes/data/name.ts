@@ -18,64 +18,64 @@ router.get('/:item', (req, res) => {
                     )
                     .then((response) => {
                         let meal;
+
                         if (response.data.meals) {
                             meal = new Meal({
                                 searchWord: req.params.item,
                                 result: response.data.meals,
                             });
-                        } else {
-                            meal = new Meal({
-                                searchWord: req.params.item,
-                                result: [{ result: 'no data' }],
-                            });
-                        }
-                        meal.save().then((savedMeal: IMeal) => {
-                            if (savedMeal) {
-                                Meal.findOneAndUpdate(
-                                    {
-                                        result: savedMeal.result,
-                                        searchWord: {
-                                            $ne: savedMeal.searchWord,
+
+                            meal.save().then((savedMeal: IMeal) => {
+                                if (savedMeal) {
+                                    Meal.findOneAndUpdate(
+                                        {
+                                            result: savedMeal.result,
+                                            searchWord: {
+                                                $ne: savedMeal.searchWord,
+                                            },
                                         },
-                                    },
-                                    {
-                                        $push: {
-                                            searchWord: savedMeal.searchWord,
+                                        {
+                                            $push: {
+                                                searchWord:
+                                                    savedMeal.searchWord,
+                                            },
                                         },
-                                    },
-                                    (
-                                        updateError: string,
-                                        updatedMeal: IMeal
-                                    ) => {
-                                        if (updatedMeal) {
-                                            Meal.findOneAndDelete(
-                                                {
-                                                    searchWord:
-                                                        savedMeal.searchWord,
-                                                },
-                                                (
-                                                    deleteError: string,
-                                                    deletedMeal: IMeal
-                                                ) => {
-                                                    if (deletedMeal)
-                                                        return res.json(
-                                                            updatedMeal.result
-                                                        );
-                                                    if (deleteError)
-                                                        console.log(
-                                                            deleteError
-                                                        );
-                                                }
-                                            );
-                                        } else {
-                                            res.json(savedMeal.result);
+                                        (
+                                            updateError: string,
+                                            updatedMeal: IMeal
+                                        ) => {
+                                            if (updatedMeal) {
+                                                Meal.findOneAndDelete(
+                                                    {
+                                                        searchWord:
+                                                            savedMeal.searchWord,
+                                                    },
+                                                    (
+                                                        deleteError: string,
+                                                        deletedMeal: IMeal
+                                                    ) => {
+                                                        if (deletedMeal)
+                                                            return res.json(
+                                                                updatedMeal.result
+                                                            );
+                                                        if (deleteError)
+                                                            console.log(
+                                                                deleteError
+                                                            );
+                                                    }
+                                                );
+                                            } else {
+                                                res.json(savedMeal.result);
+                                            }
+                                            if (updateError)
+                                                console.log(updateError);
                                         }
-                                        if (updateError)
-                                            console.log(updateError);
-                                    }
-                                );
-                            }
-                        });
+                                    );
+                                }
+                            });
+                        } else {
+                            res.json([]);
+                        }
                     })
                     .catch((error: string) => {
                         console.log(error);
@@ -90,6 +90,8 @@ router.post('/', (req, res) => {
     mealData.idMeal = Math.floor(
         Math.random() * (1000000 - 100000 + 1) + 100000
     ).toString();
+    mealData.strMeal =
+        mealData.strMeal.charAt(0).toUpperCase() + mealData.strMeal.slice(1);
 
     const filter = {
         searchWord: req.body.searchWord,
@@ -97,28 +99,31 @@ router.post('/', (req, res) => {
             $ne: req.body.mealData.strMeal,
         },
     };
-    const update = { $push: { result: mealData } };
-
-    Meal.findOneAndUpdate(
-        filter,
-        update,
-        {
-            returnOriginal: false,
+    const update = {
+        $push: {
+            result: mealData,
         },
-        function (err, foundMeal) {
-            if (err) console.log({ error: err });
-            if (foundMeal === null) {
-                res.status(403).json({
-                    errorCode: 403,
-                    message: 'Name already exists',
-                });
-            }
-            if (!err && foundMeal !== null) {
-                console.log(foundMeal.result.length);
-                res.json(foundMeal.result[foundMeal.result.length - 1]);
-            }
+    };
+    const options = {
+        returnDocument: 'after',
+    };
+
+    Meal.findOneAndUpdate(filter, update, options, function (err, foundMeal) {
+        if (err) console.log({ error: err });
+        if (foundMeal === null) {
+            res.status(403).json({
+                errorCode: 403,
+                message: 'Name already exists',
+            });
         }
-    );
+        if (!err && foundMeal !== null) {
+            res.json(
+                foundMeal.result.sort((a, b) =>
+                    a.strMeal < b.strMeal ? -1 : a.strMeal > b.strMeal ? 1 : 0
+                )
+            );
+        }
+    });
 });
 
 router.put('/', (req, res) => {

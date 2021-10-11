@@ -69,7 +69,7 @@ const MealSchema: Schema = new Schema({
             idMeal: { type: Number },
             strMeal: { type: String },
             strDrinkAlternate: { type: String },
-            strCategory: { type: String },
+            strCategory: { type: String, lowercase: true },
             strArea: { type: String },
             strInstructions: { type: String },
             strMealThumb: { type: String },
