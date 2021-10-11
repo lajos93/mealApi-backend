@@ -1,4 +1,4 @@
-const dbName = 'mealDB';
-const database = `mongodb://localhost/${dbName}`;
+const dbName = 'MealDB';
+const database = `mongodb+srv://rakimaki:rakimaki@cluster0.hlmpm.mongodb.net/${dbName}`;
 
 export { database };
