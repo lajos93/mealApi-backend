@@ -20,7 +20,7 @@ app.use('/api/meals/ingredient', ingredient);
 mongoose
     .connect(database)
     .then(() => {
-        console.table([{ server: 'running', status: 'ok' }]);
+        console.table([{ server: 'running', status: 'okay' }]);
         app.listen(3001);
     })
     .catch((error: string) => {
